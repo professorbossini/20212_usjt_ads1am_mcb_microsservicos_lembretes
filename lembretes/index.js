@@ -6,6 +6,11 @@ app.use(bodyParser.json())
 const lembretes = {}
 contador = 0
 
+app.post ('/eventos', (req, res) => {
+    console.log(req.body)
+    res.status(200).send({msg: "ok"})
+})
+
 app.post ('/lembretes', async(req, res) => {
     contador++
     const { texto } = req.body
