@@ -8,8 +8,11 @@ app.use(bodyParser.json())
 const observacoesPorLembrete = {};
 
 app.post ('/eventos', (req, res) => {
-    console.log(req.body)
-    res.status(200).send({msg: 'ok'})
+    try{
+        funcoes[req.body.tipo](req.body.dados);
+    }
+    catch (err) {}
+    res.status(200).send({msg: 'ok'});
 })
 
 //GET /lembretes/1/observacoes
@@ -34,5 +37,23 @@ app.post ('/lembretes/:id/observacoes', (req, res) => {
     })
     res.status(201).send(observacoesDoLembrete);
 })
+
+const funcoes = {
+    ObservacaoClassificada: (observacao) => {
+        const observacoes = observacoesPorLembrete[observacao.lembreteId];
+        const obsParaAtualizar = observacoes.find (o => o.id === observacao.id);
+        obsParaAtualizar.status = observacao.status;
+        axios.post('http://localhost:10000/eventos', 
+        {
+            tipo: "ObservacaoAtualizada",
+            dados: {
+                id: observacao.id,
+                texto: observacao.texto,
+                lembreteId: observacao.lembreteId,
+                status: observacao.status
+            }
+        });
+    }
+}
 
 app.listen(5000, () => console.log ("Observações. 5000"))
